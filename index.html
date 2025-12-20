@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Need That 30$ (Location)</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#121a33; --text:#e9ecff; --muted:#aab2da;
+      --line:rgba(255,255,255,.10); --good:#2ee59d; --bad:#ff5c7a; --warn:#ffd66b;
+      --shadow: 0 16px 40px rgba(0,0,0,.35); --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 700px at 20% 0%, rgba(46,229,157,.15), transparent 60%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(255,92,122,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text); min-height:100vh;
+    }
+    .wrap{ max-width:1120px; margin:0 auto; padding:24px; }
+    .header{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:flex-start; }
+    h1{ margin:0; font-size:26px; letter-spacing:.2px; }
+    .sub{ color:var(--muted); font-size:14px; line-height:1.4; margin-top:6px; }
+    .pillRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .pill{
+      background: rgba(255,255,255,.06); border:1px solid var(--line);
+      padding:8px 12px; border-radius:999px; color:var(--muted); font-size:13px;
+      backdrop-filter: blur(8px);
+    }
+    .notice{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line); border-radius: var(--radius);
+      padding:14px 16px; box-shadow: var(--shadow); margin:16px 0;
+    }
+    .notice strong{ font-weight:900; }
+
+    /* Tabs */
+    .tabs{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin: 14px 0 4px 0;
+    }
+    .tab{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tab.active{
+      border-color: rgba(46,229,157,.35);
+      background: linear-gradient(180deg, rgba(46,229,157,.20), rgba(255,255,255,.03));
+    }
+    .view{ display:none; }
+    .view.active{ display:block; }
+
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:10px;
+    }
+    .controlRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    select, button{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+    }
+    button.primary{
+      border-color: rgba(46,229,157,.35);
+      background: linear-gradient(180deg, rgba(46,229,157,.22), rgba(255,255,255,.03));
+    }
+    button.danger{
+      border-color: rgba(255,92,122,.35);
+      background: linear-gradient(180deg, rgba(255,92,122,.22), rgba(255,255,255,.03));
+    }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:14px; }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line); border-radius: var(--radius);
+      padding:14px; box-shadow: var(--shadow);
+      max-height: 430px;
+      overflow-y: auto;
+    }
+
+    /* Sticky header so name stays visible while scrolling */
+    .cardHeader{
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: linear-gradient(180deg, rgba(18,26,51,.98), rgba(18,26,51,.92));
+      backdrop-filter: blur(8px);
+      padding: 2px 0 10px 0;
+      margin: -2px 0 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+
+    .name{ font-size:18px; font-weight:900; margin:0; }
+    .badge{
+      font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+      background: rgba(255,255,255,.06); color:var(--muted); white-space:nowrap;
+    }
+    .badge.ok{ color: var(--good); border-color: rgba(46,229,157,.35); background: rgba(46,229,157,.10); }
+    .badge.bad{ color: var(--bad); border-color: rgba(255,92,122,.35); background: rgba(255,92,122,.10); }
+
+    .metric{ margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+    .box{
+      flex:1 1 120px; background: rgba(0,0,0,.18); border:1px solid var(--line);
+      border-radius: 14px; padding:10px; min-width:120px;
+    }
+    .label{ font-size:12px; color:var(--muted); }
+    .value{ margin-top:4px; font-weight:900; font-size:16px; }
+    .value.good{ color:var(--good); }
+    .value.bad{ color:var(--bad); }
+
+    .progress{
+      margin-top:10px; background: rgba(0,0,0,.20); border:1px solid var(--line);
+      border-radius:999px; height:10px; overflow:hidden;
+    }
+    .bar{ height:100%; width:0%; background: linear-gradient(90deg, rgba(46,229,157,.9), rgba(255,214,107,.85)); border-radius:999px; }
+
+    .meta{ margin-top:10px; color:var(--muted); font-size:12px; line-height:1.55; }
+    .small{ color:var(--muted); font-size:12px; }
+
+    code{
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px; border-radius:8px; color:var(--text);
+    }
+
+    /* Avatar GIF */
+    .avatar{
+      width:56px;
+      height:56px;
+      border-radius:14px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 6px 16px rgba(0,0,0,.35);
+      background: rgba(255,255,255,.06);
+    }
+    .avatar.placeholder{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:22px;
+      background: rgba(255,255,255,.08);
+      color: var(--muted);
+    }
+
+    /* Leaderboard */
+    .leaderGrid{ display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px; }
+    @media (max-width: 920px){ .leaderGrid{ grid-template-columns: 1fr; } }
+
+    .leaderItem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      margin-top:10px;
+    }
+    .rank{
+      width:34px; height:34px; border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .leaderLeft{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .leaderName{ font-weight:900; }
+    .leaderMeta{ color:var(--muted); font-size:12px; margin-top:2px; }
+    .leaderRight{ text-align:right; }
+    .leaderTime{ font-weight:900; }
+    .leaderDays{ color:var(--muted); font-size:12px; }
+
+    /* “Graffiti” top spot style */
+    .topSpot{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,214,107,.35);
+      background:
+        radial-gradient(500px 180px at 20% 0%, rgba(255,214,107,.18), transparent 65%),
+        radial-gradient(500px 180px at 90% 20%, rgba(46,229,157,.14), transparent 60%),
+        rgba(0,0,0,.18);
+    }
+    .topSpot:before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background:
+        repeating-linear-gradient(35deg,
+          rgba(255,255,255,.08) 0 8px,
+          rgba(255,255,255,0) 8px 20px
+        );
+      opacity:.18;
+      transform: rotate(-6deg);
+      pointer-events:none;
+    }
+    .sprayTag{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:14px;
+      background: rgba(255,92,122,.14);
+      border:1px solid rgba(255,92,122,.30);
+      font-weight:1000;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      text-shadow: 0 2px 12px rgba(255,92,122,.35);
+    }
+
+    /* ===== Top Spot “Hero GIF + Graffiti” ===== */
+    .topHeroWrap{
+      margin-top:12px;
+      position:relative;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(255,214,107,.35);
+      background: rgba(0,0,0,.22);
+    }
+    .topHeroImg{
+      width:100%;
+      height:260px;
+      object-fit:cover;
+      display:block;
+      filter:saturate(1.15) contrast(1.05);
+    }
+    .graffitiOverlay{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(700px 260px at 20% 0%, rgba(255,92,122,.22), transparent 60%),
+        radial-gradient(700px 260px at 90% 20%, rgba(46,229,157,.18), transparent 60%),
+        repeating-linear-gradient(25deg, rgba(255,255,255,.10) 0 10px, rgba(255,255,255,0) 10px 26px);
+      opacity:.35;
+      mix-blend-mode:screen;
+    }
+    .graffitiText{
+      position:absolute;
+      left:14px;
+      top:14px;
+      padding:10px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,92,122,.35);
+      background: rgba(255,92,122,.14);
+      font-weight:1000;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      text-shadow: 0 2px 14px rgba(255,92,122,.45);
+    }
+    .topHeroFooter{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:12px 14px;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.65));
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+    }
+    .topHeroName{
+      font-weight:1000;
+      font-size:18px;
+    }
+    .topHeroStats{
+      text-align:right;
+      font-size:12px;
+      color: var(--muted);
+    }
+    .topHeroStats b{ color: var(--text); }
+    /* Glow on winner’s small avatar (leaderboard list) */
+    .topSpot .avatar{
+      box-shadow:
+        0 0 0 2px rgba(255,214,107,.5),
+        0 0 24px rgba(255,214,107,.6);
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <h1>Need That 30$</h1>
+      <div class="sub">
+        Check in/out only works if you are within <b>80m</b> of the site location.
+        A session counts when there is an <b>enter + exit</b> on the same day. Goal: <b>5 sessions/week</b>.
+      </div>
+      <div class="pillRow">
+        <div class="pill" id="weekLabel">Week: …</div>
+        <div class="pill">Site center: <code>49.8294722, -97.1121389</code></div>
+        <div class="pill">Fine: <b>$30</b> per missing session (weekly)</div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" id="tabThis">📅 This Week</div>
+        <div class="tab" id="tabLast">🗂️ Last Week + Leaderboard</div>
+      </div>
+    </div>
+
+    <div class="controlRow">
+      <button id="refreshBtn">Refresh</button>
+    </div>
+  </div>
+
+  <!-- View: This Week -->
+  <div class="view active" id="viewThis">
+    <div class="notice">
+      <div><strong id="statusTitle">Status:</strong> <span id="statusText">Loading…</span></div>
+      <div class="small" id="statusHint"></div>
+
+      <div class="controls">
+        <div class="controlRow">
+          <label class="small">Member:</label>
+          <select id="memberSelect">
+            <option value="ather">Ather</option>
+            <option value="ahsan">Ahsan</option>
+            <option value="zaman">Zaman</option>
+            <option value="zain">Zain</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+
+        <div class="controlRow">
+          <button class="primary" id="enterBtn" disabled>Enter (Check In)</button>
+          <button class="danger" id="exitBtn" disabled>Exit (Check Out)</button>
+          <button id="locBtn">Update Location</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="dashboardThis"></div>
+
+    <div class="small" style="margin-top:16px; opacity:.9;">
+      If location permission is blocked: browser settings → allow location for this site.
+    </div>
+  </div>
+
+  <!-- View: Last Week -->
+  <div class="view" id="viewLast">
+    <div class="notice">
+      <div><strong>Last Week Records</strong></div>
+      <div class="small" id="lastWeekLabel">Loading…</div>
+      <div class="small" style="margin-top:8px;">
+        Leaderboard uses <b>total time inside the gym</b> (enter/exit pairs). If someone forgets to exit, that time won’t count.
+      </div>
+    </div>
+
+    <div class="leaderGrid">
+      <div class="card" style="max-height:unset; overflow:visible;">
+        <div class="cardHeader">
+          <div class="name">Leaderboard (Last Week)</div>
+          <span class="badge" style="border-color:rgba(255,214,107,.35); background:rgba(255,214,107,.10); color:var(--warn);">
+            Most time wins 🏆
+          </span>
+        </div>
+        <div id="leaderboard"></div>
+      </div>
+
+      <div class="card" style="max-height:unset; overflow:visible;">
+        <div class="cardHeader">
+          <div class="name">Top Spot</div>
+          <span class="badge ok">Highlight</span>
+        </div>
+        <div id="topSpotBox"></div>
+      </div>
+    </div>
+
+    <div class="grid" id="dashboardLast"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ✅ Supabase keys (public anon key is OK with RLS)
+  const SUPABASE_URL = "https://gkdqcajcgxvxyjwxhlvj.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_bYM4kFE6m1rbmojI3jNRow_xP4kE1hG";
+
+  // ✅ Location rules
+  const SITE_LAT = 49.82947222222223;
+  const SITE_LON = -97.11213888888888;
+  const ALLOWED_RADIUS_M = 80;
+
+  // App rules
+  const MEMBERS = ["ather", "ahsan", "zaman", "zain", "unknown"];
+  const FINE_PER_MISSING_SESSION = 30;
+
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const $ = (id) => document.getElementById(id);
+
+  function setStatus(title, text, hint="") {
+    $("statusTitle").textContent = title;
+    $("statusText").textContent = text;
+    $("statusHint").textContent = hint;
+  }
+
+  // Avatar HTML (uses /gif folder). Safe fallback if file missing.
+  function memberAvatar(member){
+    const hasFile = ["ather","ahsan","zaman","zain"].includes(member);
+    if (!hasFile) return `<div class="avatar placeholder">?</div>`;
+
+    return `
+      <img class="avatar"
+        src="gif/${member}.gif"
+        alt="${member}"
+        onerror="this.outerHTML='<div class=&quot;avatar placeholder&quot;>?</div>'"
+      >
+    `;
+  }
+
+  // ===== Tabs / Views =====
+  function setView(which){
+    const isThis = which === "this";
+    $("viewThis").classList.toggle("active", isThis);
+    $("viewLast").classList.toggle("active", !isThis);
+    $("tabThis").classList.toggle("active", isThis);
+    $("tabLast").classList.toggle("active", !isThis);
+  }
+
+  // ===== Week functions (Monday start) =====
+  function startOfWeekLocal(d = new Date()){
+    const x = new Date(d);
+    const day = x.getDay(); // Sun=0..Sat=6
+    const diffToMonday = (day === 0 ? -6 : 1 - day);
+    x.setDate(x.getDate() + diffToMonday);
+    x.setHours(0,0,0,0);
+    return x;
+  }
+
+  function endOfWeekLocal(d = new Date()){
+    const s = startOfWeekLocal(d);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 7);
+    return e; // exclusive
+  }
+
+  function startOfLastWeekLocal(){
+    const sThis = startOfWeekLocal();
+    const sLast = new Date(sThis);
+    sLast.setDate(sLast.getDate() - 7);
+    return sLast;
+  }
+  function endOfLastWeekLocal(){
+    return startOfWeekLocal(); // end of last week = start of this week
+  }
+
+  function setWeekLabel(){
+    const s = startOfWeekLocal();
+    const e = endOfWeekLocal();
+    const eInc = new Date(e.getTime() - 1);
+    $("weekLabel").textContent = `Week: ${s.toLocaleDateString()} → ${eInc.toLocaleDateString()}`;
+
+    const ls = startOfLastWeekLocal();
+    const le = new Date(endOfLastWeekLocal().getTime() - 1);
+    $("lastWeekLabel").textContent = `Last week: ${ls.toLocaleDateString()} → ${le.toLocaleDateString()}`;
+  }
+
+  function ymdLocal(dt){
+    const d = new Date(dt);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  function fmt(dt){
+    try { return new Date(dt).toLocaleString(); } catch { return String(dt); }
+  }
+  function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ===== Distance (Haversine) =====
+  function distanceMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const toRad = (x) => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  let lastGeo = null; // {lat, lon, accuracy, dist}
+
+  function updateButtonsEnabled() {
+    const ok = lastGeo && lastGeo.dist <= ALLOWED_RADIUS_M;
+    $("enterBtn").disabled = !ok;
+    $("exitBtn").disabled = !ok;
+
+    if (!lastGeo) {
+      setStatus("Status:", "Location not checked yet.", "Tap “Update Location” and allow location permission.");
+      return;
+    }
+
+    const distTxt = `${Math.round(lastGeo.dist)}m away (accuracy ~${Math.round(lastGeo.accuracy)}m)`;
+    if (ok) setStatus("Status:", "✅ You are inside the allowed zone.", distTxt);
+    else setStatus("Status:", "❌ You are outside the allowed zone.", `Blocked. ${distTxt}. Must be within ${ALLOWED_RADIUS_M}m.`);
+  }
+
+  async function getLocationOnce() {
+    if (!navigator.geolocation) {
+      lastGeo = null;
+      updateButtonsEnabled();
+      setStatus("Status:", "This browser doesn't support location.", "Try Chrome/Safari on your phone.");
+      return;
+    }
+
+    setStatus("Status:", "Requesting location…", "Please allow location permission.");
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const acc = pos.coords.accuracy || 9999;
+        const dist = distanceMeters(lat, lon, SITE_LAT, SITE_LON);
+        lastGeo = { lat, lon, accuracy: acc, dist };
+        updateButtonsEnabled();
+      },
+      (err) => {
+        lastGeo = null;
+        updateButtonsEnabled();
+        setStatus("Status:", "Location blocked / failed.", "Enable location permission in browser settings, then try again.");
+        console.warn(err);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+    );
+  }
+
+  async function logAction(action) {
+    const member = $("memberSelect").value;
+
+    if (!MEMBERS.includes(member)) { alert("Invalid member."); return; }
+    if (!lastGeo || lastGeo.dist > ALLOWED_RADIUS_M) {
+      alert(`You must be within ${ALLOWED_RADIUS_M}m to log.`);
+      return;
+    }
+
+    const { error } = await db.from("logs").insert({ member, action });
+    if (error) {
+      alert("Could not log. Check Supabase table + RLS policies.");
+      console.warn(error);
+      return;
+    }
+
+    alert(`${cap(member)} ${action.toUpperCase()} logged ✅`);
+    await refreshAll();
+  }
+
+  function progressPercent(sessions){ return Math.max(0, Math.min(100, (sessions/5)*100)); }
+
+  // ===== Time calculation (enter/exit pairing) =====
+  function computeDayDurationMs(events){
+    const sorted = [...events].sort((a,b)=> new Date(a.created_at)-new Date(b.created_at));
+    let total = 0;
+    let openEnter = null;
+
+    for (const ev of sorted){
+      if (ev.action === "enter"){
+        if (!openEnter) openEnter = new Date(ev.created_at);
+      } else if (ev.action === "exit"){
+        if (openEnter){
+          const exitT = new Date(ev.created_at);
+          if (exitT > openEnter) total += (exitT - openEnter);
+          openEnter = null;
+        }
+      }
+    }
+    return total;
+  }
+
+  function msToHms(ms){
+    const s = Math.max(0, Math.floor(ms/1000));
+    const h = Math.floor(s/3600);
+    const m = Math.floor((s%3600)/60);
+    return `${h}h ${m}m`;
+  }
+
+  // ===== Build per-member structure =====
+  function buildPerMember(logs){
+    const per = {};
+    for (const m of MEMBERS) per[m] = {};
+
+    for (const row of logs) {
+      if (!MEMBERS.includes(row.member)) continue;
+      if (!["enter","exit"].includes(row.action)) continue;
+
+      const dayKey = ymdLocal(row.created_at);
+      per[row.member][dayKey] ||= { enters: [], exits: [], events: [] };
+      per[row.member][dayKey].events.push({ action: row.action, created_at: row.created_at });
+      (row.action === "enter" ? per[row.member][dayKey].enters : per[row.member][dayKey].exits).push(row.created_at);
+    }
+    return per;
+  }
+
+  async function loadWeekDashboard(weekStart, weekEnd, dashElId, showFines){
+    const dash = $(dashElId);
+    dash.innerHTML = "";
+
+    const { data, error } = await db
+      .from("logs")
+      .select("*")
+      .gte("created_at", weekStart.toISOString())
+      .lt("created_at", weekEnd.toISOString())
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      dash.innerHTML = `<div class="card"><b style="color:var(--bad)">Error loading logs</b><div class="meta">${error.message}</div></div>`;
+      return { logs: [], per: buildPerMember([]) };
+    }
+
+    const logs = data || [];
+    const per = buildPerMember(logs);
+
+    for (const m of MEMBERS) {
+      const daysObj = per[m];
+      const dayKeys = Object.keys(daysObj).sort();
+
+      const completedDays = dayKeys.filter(dk => daysObj[dk].enters.length && daysObj[dk].exits.length);
+      const sessions = completedDays.length;
+
+      const remaining = Math.max(0, 5 - sessions);
+      const fine = remaining * FINE_PER_MISSING_SESSION;
+      const isDone = sessions >= 5;
+
+      let lastEnter = null, lastExit = null;
+      for (const dk of dayKeys) {
+        for (const t of daysObj[dk].enters) lastEnter = t;
+        for (const t of daysObj[dk].exits) lastExit = t;
+      }
+
+      const badge = isDone
+        ? `<span class="badge ok">Completed ✅</span>`
+        : `<span class="badge bad">Incomplete</span>`;
+
+      const barW = progressPercent(sessions);
+
+      const dayLines = completedDays.slice(-20).map(dk => {
+        const firstEnter = daysObj[dk].enters[0];
+        const lastExitForDay = daysObj[dk].exits[daysObj[dk].exits.length - 1];
+        return `<div class="small">• ${dk}: enter ${fmt(firstEnter)} | exit ${fmt(lastExitForDay)}</div>`;
+      }).join("");
+
+      const fineOrDaysBox = showFines ? `
+        <div class="box">
+          <div class="label">Fine (this week)</div>
+          <div class="value ${fine > 0 ? "bad" : "good"}">$${fine}</div>
+        </div>
+      ` : `
+        <div class="box">
+          <div class="label">Days attended</div>
+          <div class="value ${sessions > 0 ? "good" : "bad"}">${sessions}</div>
+        </div>
+      `;
+
+      dash.innerHTML += `
+        <div class="card">
+          <div class="cardHeader">
+            <div style="display:flex; align-items:center; gap:10px;">
+              ${memberAvatar(m)}
+              <div class="name">${cap(m)}</div>
+            </div>
+            ${badge}
+          </div>
+
+          <div class="metric">
+            <div class="box">
+              <div class="label">Sessions</div>
+              <div class="value ${isDone ? "good":"bad"}">${sessions}/5</div>
+            </div>
+            ${fineOrDaysBox}
+          </div>
+
+          <div class="progress" title="${barW.toFixed(0)}%">
+            <div class="bar" style="width:${barW}%;"></div>
+          </div>
+
+          <div class="meta">
+            <div>Last enter: <b>${lastEnter ? fmt(lastEnter) : "—"}</b></div>
+            <div>Last exit: <b>${lastExit ? fmt(lastExit) : "—"}</b></div>
+            ${showFines ? `<div class="small" style="margin-top:6px;">Missing sessions: <b>${remaining}</b> × $${FINE_PER_MISSING_SESSION} = <b>$${fine}</b></div>` : ``}
+          </div>
+
+          <div class="meta" style="margin-top:10px;">
+            <b>Completed days:</b><br/>
+            ${dayLines || `<span class="small">No completed session days yet.</span>`}
+          </div>
+        </div>
+      `;
+    }
+
+    return { logs, per };
+  }
+
+  function buildLeaderboardFromPer(per){
+    const stats = MEMBERS.map(m=>{
+      const daysObj = per[m];
+      const dayKeys = Object.keys(daysObj);
+      let days = 0;
+      let totalMs = 0;
+
+      for (const dk of dayKeys){
+        const d = daysObj[dk];
+        const hasSession = d.enters.length && d.exits.length;
+        if (hasSession) days += 1;
+        totalMs += computeDayDurationMs(d.events);
+      }
+      return { member: m, days, totalMs };
+    });
+
+    stats.sort((a,b)=> b.totalMs - a.totalMs);
+    return stats;
+  }
+
+  function renderLeaderboard(stats){
+    const box = $("leaderboard");
+    box.innerHTML = "";
+
+    stats.forEach((s, idx)=>{
+      const isTop = idx === 0 && s.totalMs > 0;
+      const itemClass = isTop ? "leaderItem topSpot" : "leaderItem";
+      const tag = isTop ? ` <span class="sprayTag">TOP SPOT</span>` : ``;
+
+      box.innerHTML += `
+        <div class="${itemClass}">
+          <div class="leaderLeft">
+            <div class="rank">${idx+1}</div>
+            <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+              ${memberAvatar(s.member)}
+              <div style="min-width:0;">
+                <div class="leaderName">${cap(s.member)}${tag}</div>
+                <div class="leaderMeta">Total time: <b>${msToHms(s.totalMs)}</b></div>
+              </div>
+            </div>
+          </div>
+          <div class="leaderRight">
+            <div class="leaderTime">${msToHms(s.totalMs)}</div>
+            <div class="leaderDays">${s.days} day(s)</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // ✅ UPDATED: full-size winner GIF + graffiti in Top Spot
+  function renderTopSpot(stats){
+    const top = stats[0];
+    const box = $("topSpotBox");
+
+    if (!top || top.totalMs <= 0){
+      box.innerHTML = `
+        <div class="notice" style="margin:0;">
+          <div><strong>No top spot yet</strong></div>
+          <div class="small">Once someone logs real enter/exit pairs, the #1 spot will show here.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const hasGif = ["ather","ahsan","zaman","zain"].includes(top.member);
+
+    const heroMedia = hasGif ? `
+      <img class="topHeroImg"
+        src="gif/${top.member}.gif"
+        alt="${top.member}"
+        onerror="this.outerHTML='<div class=&quot;topHeroImg&quot; style=&quot;display:flex;align-items:center;justify-content:center;height:260px;background:rgba(255,255,255,.06);color:var(--muted);font-weight:1000;&quot;>NO GIF</div>'"
+      >
+    ` : `
+      <div class="topHeroImg" style="display:flex;align-items:center;justify-content:center;height:260px;background:rgba(255,255,255,.06);color:var(--muted);font-weight:1000;">
+        UNKNOWN
+      </div>
+    `;
+
+    box.innerHTML = `
+      <div class="notice topSpot" style="margin:0;">
+        <div class="sprayTag">TOP SPOT</div>
+        <div style="margin-top:10px; font-size:18px; font-weight:1000;">${cap(top.member)}</div>
+        <div class="small" style="margin-top:6px;">This week’s gym time champion 🏆</div>
+
+        <div class="topHeroWrap">
+          ${heroMedia}
+          <div class="graffitiOverlay"></div>
+          <div class="graffitiText">🏆 TOP SPOT</div>
+
+          <div class="topHeroFooter">
+            <div class="topHeroName">${cap(top.member)}</div>
+            <div class="topHeroStats">
+              Total: <b>${msToHms(top.totalMs)}</b><br/>
+              Days: <b>${top.days}</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta" style="margin-top:10px;">
+          Tip: Time is calculated by pairing <b>enter → exit</b> in order. If someone forgets to exit, that time won’t count.
+        </div>
+      </div>
+    `;
+  }
+
+  async function refreshAll(){
+    // This week
+    const ws = startOfWeekLocal();
+    const we = endOfWeekLocal();
+    await loadWeekDashboard(ws, we, "dashboardThis", true);
+
+    // Last week
+    const lws = startOfLastWeekLocal();
+    const lwe = endOfLastWeekLocal();
+    const { per } = await loadWeekDashboard(lws, lwe, "dashboardLast", false);
+
+    const stats = buildLeaderboardFromPer(per);
+    renderLeaderboard(stats);
+    renderTopSpot(stats);
+  }
+
+  async function init(){
+    setWeekLabel();
+
+    $("tabThis").addEventListener("click", ()=> setView("this"));
+    $("tabLast").addEventListener("click", ()=> setView("last"));
+
+    $("locBtn").addEventListener("click", getLocationOnce);
+    $("enterBtn").addEventListener("click", () => logAction("enter"));
+    $("exitBtn").addEventListener("click", () => logAction("exit"));
+    $("refreshBtn").addEventListener("click", refreshAll);
+
+    updateButtonsEnabled();
+    await refreshAll();
+  }
+
+  init();
+</script>
+</body>
+</html>
