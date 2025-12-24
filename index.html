@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Need That 25$ (Location)</title>
+  <title>Need That 25 – Gym Check-in Tracker</title>
+
+  <!-- Nicer font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg:#0b1020; --card:#121a33; --text:#e9ecff; --muted:#aab2da;
@@ -12,7 +21,8 @@
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      margin:0;
+      font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background: radial-gradient(1200px 700px at 20% 0%, rgba(46,229,157,.15), transparent 60%),
                   radial-gradient(900px 600px at 90% 10%, rgba(255,92,122,.12), transparent 55%),
                   var(--bg);
@@ -20,7 +30,25 @@
     }
     .wrap{ max-width:1120px; margin:0 auto; padding:24px; }
     .header{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:flex-start; }
-    h1{ margin:0; font-size:26px; letter-spacing:.2px; }
+
+    h1{
+      margin:0;
+      font-size:32px;
+      letter-spacing:.3px;
+      background: linear-gradient(90deg, #2ee59d, #ffd66b);
+      -webkit-background-clip:text;
+      color:transparent;
+      text-shadow: 0 3px 18px rgba(0,0,0,.6);
+    }
+
+    .tagline{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:2px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
     .sub{ color:var(--muted); font-size:14px; line-height:1.4; margin-top:6px; }
     .pillRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
     .pill{
@@ -34,6 +62,50 @@
       padding:14px 16px; box-shadow: var(--shadow); margin:16px 0;
     }
     .notice strong{ font-weight:900; }
+
+    .sectionTitle{
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+      color:var(--muted);
+    }
+
+    /* Check-in panel layout */
+    .checkinPanel{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .checkinLeft{
+      flex: 1 1 260px;
+      min-width:220px;
+    }
+    .checkinRight{
+      flex: 1 1 260px;
+      min-width:220px;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,.16);
+      padding:10px 12px;
+      background: rgba(0,0,0,.20);
+    }
+    .checkinSteps{
+      margin-top:8px;
+      line-height:1.5;
+    }
+    .currentMember{
+      margin-bottom:6px;
+      font-size:13px;
+    }
+    .currentMember span{
+      font-weight:700;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(46,229,157,.35);
+      background: rgba(46,229,157,.12);
+    }
 
     /* Tabs */
     .tabs{
@@ -51,6 +123,7 @@
       display:flex;
       align-items:center;
       gap:8px;
+      font-size:13px;
     }
     .tab.active{
       border-color: rgba(46,229,157,.35);
@@ -71,6 +144,8 @@
       padding:10px 12px;
       border-radius:12px;
       cursor:pointer;
+      font-family: inherit;
+      font-size:13px;
     }
     button.primary{
       border-color: rgba(46,229,157,.35);
@@ -82,7 +157,17 @@
     }
     button:disabled{ opacity:.5; cursor:not-allowed; }
 
-    .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:14px; }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
@@ -90,6 +175,21 @@
       padding:14px; box-shadow: var(--shadow);
       max-height: 430px;
       overflow-y: auto;
+      transition: transform .15s ease-out, box-shadow .15s ease-out, border-color .15s ease-out;
+      animation: cardIn .25s ease-out;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+      border-color: rgba(46,229,157,.45);
+    }
+
+    .card-incomplete{
+      border-color: rgba(255,92,122,.6);
+      box-shadow: 0 16px 40px rgba(255,92,122,.3);
+      background:
+        radial-gradient(500px 180px at 0% 0%, rgba(255,92,122,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.2));
     }
 
     /* Sticky header so name stays visible while scrolling */
@@ -284,6 +384,7 @@
       color: var(--muted);
     }
     .topHeroStats b{ color: var(--text); }
+
     /* Glow on winner’s small avatar (leaderboard list) */
     .topSpot .avatar{
       box-shadow:
@@ -298,9 +399,10 @@
   <div class="header">
     <div>
       <h1>Need That 25$</h1>
+      <div class="tagline">Gym attendance • Check-in, fines & leaderboard</div>
       <div class="sub">
-        Check in/out only works if you are within <b>80m</b> of the site location.
-        A session counts when there is an <b>enter + exit</b> on the same day. Goal: <b>5 sessions/week</b>.
+        You only get credit if you are within <b>80m</b> of the site and you do an <b>enter + exit</b> within a few hours.
+        Sessions can cross midnight (11pm → 1am). Goal: <b>5 sessions/week</b>. Every missing day costs you <b>$25</b>.
       </div>
       <div class="pillRow">
         <div class="pill" id="weekLabel">Week: …</div>
@@ -321,13 +423,29 @@
 
   <!-- View: This Week -->
   <div class="view active" id="viewThis">
-    <div class="notice">
-      <div><strong id="statusTitle">Status:</strong> <span id="statusText">Loading…</span></div>
-      <div class="small" id="statusHint"></div>
+    <div class="notice checkinPanel">
+      <div class="checkinLeft">
+        <div class="sectionTitle">Live Check-in</div>
 
-      <div class="controls">
-        <div class="controlRow">
-          <label class="small">Member:</label>
+        <div class="currentMember">
+          Current member: <span id="currentMemberLabel">Ather</span>
+        </div>
+
+        <div><strong id="statusTitle">Status:</strong> <span id="statusText">Loading…</span></div>
+        <div class="small" id="statusHint"></div>
+
+        <div class="checkinSteps small">
+          <b>How to log a session:</b><br/>
+          1) Pick your name • 2) Tap <b>Update Location</b> • 3) Tap <b>Enter</b> when you arrive and <b>Exit</b> when you leave.<br/>
+          Multiple check-ins in a day still count as <b>1 session</b> (but time adds up).
+        </div>
+      </div>
+
+      <div class="checkinRight">
+        <div class="small" style="margin-bottom:6px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">
+          Step 1 – Choose member
+        </div>
+        <div class="controlRow" style="margin-bottom:10px;">
           <select id="memberSelect">
             <option value="ather">Ather</option>
             <option value="ahsan">Ahsan</option>
@@ -337,10 +455,19 @@
           </select>
         </div>
 
+        <div class="small" style="margin-bottom:4px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">
+          Step 2 – Confirm you’re at the gym
+        </div>
+        <div class="controlRow" style="margin-bottom:10px;">
+          <button id="locBtn">Update Location</button>
+        </div>
+
+        <div class="small" style="margin-bottom:4px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);">
+          Step 3 – Enter / Exit
+        </div>
         <div class="controlRow">
           <button class="primary" id="enterBtn" disabled>Enter (Check In)</button>
           <button class="danger" id="exitBtn" disabled>Exit (Check Out)</button>
-          <button id="locBtn">Update Location</button>
         </div>
       </div>
     </div>
@@ -355,10 +482,11 @@
   <!-- View: Last Week -->
   <div class="view" id="viewLast">
     <div class="notice">
-      <div><strong>Last Week Records</strong></div>
+      <div class="sectionTitle">Last Week Summary</div>
       <div class="small" id="lastWeekLabel">Loading…</div>
       <div class="small" style="margin-top:8px;">
-        Leaderboard uses <b>total time inside the gym</b> (enter/exit pairs). If someone forgets to exit, that time won’t count.
+        Leaderboard uses <b>total time inside the gym</b> from all enter→exit pairs (even past midnight).
+        If someone forgets to exit, that time won’t count.
       </div>
     </div>
 
@@ -384,6 +512,10 @@
 
     <div class="grid" id="dashboardLast"></div>
   </div>
+
+  <div class="small" style="margin-top:24px; text-align:center; opacity:.7;">
+    Need That 25$ • Built for the squad 🏋️‍♂️
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -399,7 +531,7 @@
 
   // App rules
   const MEMBERS = ["ather", "ahsan", "zaman", "zain", "unknown"];
-  const FINE_PER_MISSING_SESSION = 25;
+  const FINE_PER_MISSING_SESSION = 25; // stays 25
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const $ = (id) => document.getElementById(id);
@@ -408,6 +540,14 @@
     $("statusTitle").textContent = title;
     $("statusText").textContent = text;
     $("statusHint").textContent = hint;
+  }
+
+  function updateCurrentMemberLabel(){
+    const sel = $("memberSelect");
+    const label = $("currentMemberLabel");
+    if (sel && label){
+      label.textContent = sel.options[sel.selectedIndex].textContent || sel.value;
+    }
   }
 
   // Avatar HTML (uses /gif folder). Safe fallback if file missing.
@@ -565,50 +705,84 @@
 
   function progressPercent(sessions){ return Math.max(0, Math.min(100, (sessions/5)*100)); }
 
-  // ===== Time calculation (enter/exit pairing) =====
-  function computeDayDurationMs(events){
-    const sorted = [...events].sort((a,b)=> new Date(a.created_at)-new Date(b.created_at));
-    let total = 0;
+  // ===== NEW: build events per member for a week =====
+  function buildEventsPerMember(logs){
+    const eventsPerMember = {};
+    for (const m of MEMBERS) eventsPerMember[m] = [];
+
+    for (const row of logs){
+      if (!MEMBERS.includes(row.member)) continue;
+      if (!["enter","exit"].includes(row.action)) continue;
+      eventsPerMember[row.member].push({
+        action: row.action,
+        created_at: row.created_at
+      });
+    }
+
+    // sort each member's events by time
+    for (const m of MEMBERS){
+      eventsPerMember[m].sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+    }
+    return eventsPerMember;
+  }
+
+  // ===== NEW: compute sessions & durations from events (cross-midnight OK) =====
+  function computeSessionsFromEvents(events){
+    const sorted = [...events].sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+    let sessions = [];
     let openEnter = null;
+    let lastEnterTs = null;
+    let lastExitTs = null;
 
     for (const ev of sorted){
+      const t = new Date(ev.created_at);
       if (ev.action === "enter"){
-        if (!openEnter) openEnter = new Date(ev.created_at);
+        lastEnterTs = t;
+        // override any previous open enter (if they spam enter)
+        openEnter = t;
       } else if (ev.action === "exit"){
-        if (openEnter){
-          const exitT = new Date(ev.created_at);
-          if (exitT > openEnter) total += (exitT - openEnter);
+        lastExitTs = t;
+        if (openEnter && t > openEnter){
+          sessions.push({ enter: openEnter, exit: t });
           openEnter = null;
         }
       }
     }
-    return total;
-  }
 
-  function msToHms(ms){
-    const s = Math.max(0, Math.floor(ms/1000));
-    const h = Math.floor(s/3600);
-    const m = Math.floor((s%3600)/60);
-    return `${h}h ${m}m`;
-  }
+    const byDay = {};
+    let totalMs = 0;
 
-  // ===== Build per-member structure =====
-  function buildPerMember(logs){
-    const per = {};
-    for (const m of MEMBERS) per[m] = {};
+    for (const s of sessions){
+      const dk = ymdLocal(s.enter); // assign session to ENTER day
+      const dur = Math.max(0, s.exit - s.enter);
+      totalMs += dur;
 
-    for (const row of logs) {
-      if (!MEMBERS.includes(row.member)) continue;
-      if (!["enter","exit"].includes(row.action)) continue;
-
-      const dayKey = ymdLocal(row.created_at);
-      per[row.member][dayKey] ||= { enters: [], exits: [], events: [] };
-      per[row.member][dayKey].events.push({ action: row.action, created_at: row.created_at });
-      (row.action === "enter" ? per[row.member][dayKey].enters : per[row.member][dayKey].exits).push(row.created_at);
+      if (!byDay[dk]){
+        byDay[dk] = {
+          firstEnter: s.enter,
+          lastExit: s.exit
+        };
+      } else {
+        if (s.enter < byDay[dk].firstEnter) byDay[dk].firstEnter = s.enter;
+        if (s.exit > byDay[dk].lastExit) byDay[dk].lastExit = s.exit;
+      }
     }
-    return per;
+
+    const completedDays = Object.keys(byDay).sort();
+    const sessionsCount = completedDays.length; // 1 per day max
+
+    return {
+      sessions,
+      byDay,
+      completedDays,
+      sessionsCount,
+      totalMs,
+      lastEnterTs,
+      lastExitTs
+    };
   }
 
+  // ===== Week dashboard (cards) =====
   async function loadWeekDashboard(weekStart, weekEnd, dashElId, showFines){
     const dash = $(dashElId);
     dash.innerHTML = "";
@@ -622,28 +796,24 @@
 
     if (error) {
       dash.innerHTML = `<div class="card"><b style="color:var(--bad)">Error loading logs</b><div class="meta">${error.message}</div></div>`;
-      return { logs: [], per: buildPerMember([]) };
+      return { logs: [], eventsPerMember: buildEventsPerMember([]) };
     }
 
     const logs = data || [];
-    const per = buildPerMember(logs);
+    const eventsPerMember = buildEventsPerMember(logs);
 
     for (const m of MEMBERS) {
-      const daysObj = per[m];
-      const dayKeys = Object.keys(daysObj).sort();
+      const events = eventsPerMember[m] || [];
+      const stats = computeSessionsFromEvents(events);
 
-      const completedDays = dayKeys.filter(dk => daysObj[dk].enters.length && daysObj[dk].exits.length);
-      const sessions = completedDays.length;
-
+      const sessions = stats.sessionsCount;
+      const completedDays = stats.completedDays;
       const remaining = Math.max(0, 5 - sessions);
       const fine = remaining * FINE_PER_MISSING_SESSION;
       const isDone = sessions >= 5;
 
-      let lastEnter = null, lastExit = null;
-      for (const dk of dayKeys) {
-        for (const t of daysObj[dk].enters) lastEnter = t;
-        for (const t of daysObj[dk].exits) lastExit = t;
-      }
+      const lastEnter = stats.lastEnterTs;
+      const lastExit = stats.lastExitTs;
 
       const badge = isDone
         ? `<span class="badge ok">Completed ✅</span>`
@@ -652,9 +822,8 @@
       const barW = progressPercent(sessions);
 
       const dayLines = completedDays.slice(-20).map(dk => {
-        const firstEnter = daysObj[dk].enters[0];
-        const lastExitForDay = daysObj[dk].exits[daysObj[dk].exits.length - 1];
-        return `<div class="small">• ${dk}: enter ${fmt(firstEnter)} | exit ${fmt(lastExitForDay)}</div>`;
+        const info = stats.byDay[dk];
+        return `<div class="small">• ${dk}: enter ${fmt(info.firstEnter)} | exit ${fmt(info.lastExit)}</div>`;
       }).join("");
 
       const fineOrDaysBox = showFines ? `
@@ -669,8 +838,10 @@
         </div>
       `;
 
+      const cardClass = isDone ? "card" : "card card-incomplete";
+
       dash.innerHTML += `
-        <div class="card">
+        <div class="${cardClass}">
           <div class="cardHeader">
             <div style="display:flex; align-items:center; gap:10px;">
               ${memberAvatar(m)}
@@ -705,27 +876,23 @@
       `;
     }
 
-    return { logs, per };
+    return { logs, eventsPerMember };
   }
 
-  function buildLeaderboardFromPer(per){
-    const stats = MEMBERS.map(m=>{
-      const daysObj = per[m];
-      const dayKeys = Object.keys(daysObj);
-      let days = 0;
-      let totalMs = 0;
-
-      for (const dk of dayKeys){
-        const d = daysObj[dk];
-        const hasSession = d.enters.length && d.exits.length;
-        if (hasSession) days += 1;
-        totalMs += computeDayDurationMs(d.events);
-      }
-      return { member: m, days, totalMs };
+  // ===== Leaderboard from events =====
+  function buildLeaderboardFromEvents(eventsPerMember){
+    const statsArr = MEMBERS.map(m=>{
+      const events = eventsPerMember[m] || [];
+      const stats = computeSessionsFromEvents(events);
+      return {
+        member: m,
+        days: stats.sessionsCount,
+        totalMs: stats.totalMs
+      };
     });
 
-    stats.sort((a,b)=> b.totalMs - a.totalMs);
-    return stats;
+    statsArr.sort((a,b)=> b.totalMs - a.totalMs);
+    return statsArr;
   }
 
   function renderLeaderboard(stats){
@@ -758,7 +925,15 @@
     });
   }
 
-  // ✅ UPDATED: full-size winner GIF + graffiti in Top Spot
+  // Convert ms to "0h 00m"
+  function msToHms(ms){
+    const s = Math.max(0, Math.floor(ms/1000));
+    const h = Math.floor(s/3600);
+    const m = Math.floor((s%3600)/60);
+    return `${h}h ${m}m`;
+  }
+
+  // ✅ Top Spot hero GIF + graffiti
   function renderTopSpot(stats){
     const top = stats[0];
     const box = $("topSpotBox");
@@ -823,15 +998,16 @@
     // Last week
     const lws = startOfLastWeekLocal();
     const lwe = endOfLastWeekLocal();
-    const { per } = await loadWeekDashboard(lws, lwe, "dashboardLast", false);
+    const { eventsPerMember } = await loadWeekDashboard(lws, lwe, "dashboardLast", false);
 
-    const stats = buildLeaderboardFromPer(per);
+    const stats = buildLeaderboardFromEvents(eventsPerMember);
     renderLeaderboard(stats);
     renderTopSpot(stats);
   }
 
   async function init(){
     setWeekLabel();
+    updateCurrentMemberLabel();
 
     $("tabThis").addEventListener("click", ()=> setView("this"));
     $("tabLast").addEventListener("click", ()=> setView("last"));
@@ -840,6 +1016,7 @@
     $("enterBtn").addEventListener("click", () => logAction("enter"));
     $("exitBtn").addEventListener("click", () => logAction("exit"));
     $("refreshBtn").addEventListener("click", refreshAll);
+    $("memberSelect").addEventListener("change", updateCurrentMemberLabel);
 
     updateButtonsEnabled();
     await refreshAll();
@@ -849,4 +1026,3 @@
 </script>
 </body>
 </html>
-
