@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Need That 30$ (Location)</title>
+  <title>Need That 25$ (Location)</title>
   <style>
     :root{
       --bg:#0b1020; --card:#121a33; --text:#e9ecff; --muted:#aab2da;
@@ -297,7 +297,7 @@
 <div class="wrap">
   <div class="header">
     <div>
-      <h1>Need That 30$</h1>
+      <h1>Need That 25$</h1>
       <div class="sub">
         Check in/out only works if you are within <b>80m</b> of the site location.
         A session counts when there is an <b>enter + exit</b> on the same day. Goal: <b>5 sessions/week</b>.
@@ -305,7 +305,7 @@
       <div class="pillRow">
         <div class="pill" id="weekLabel">Week: …</div>
         <div class="pill">Site center: <code>49.8294722, -97.1121389</code></div>
-        <div class="pill">Fine: <b>$30</b> per missing session (weekly)</div>
+        <div class="pill">Fine: <b>$25</b> per missing session (weekly)</div>
       </div>
 
       <div class="tabs">
@@ -399,7 +399,7 @@
 
   // App rules
   const MEMBERS = ["ather", "ahsan", "zaman", "zain", "unknown"];
-  const FINE_PER_MISSING_SESSION = 30;
+  const FINE_PER_MISSING_SESSION = 25;
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const $ = (id) => document.getElementById(id);
@@ -849,3 +849,4 @@
 </script>
 </body>
 </html>
+
